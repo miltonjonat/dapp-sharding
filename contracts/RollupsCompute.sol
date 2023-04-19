@@ -40,17 +40,19 @@ contract RollupsCompute {
 
     /// @notice Returns salt used to deterministically calculate instance addresses
     /// @dev Used internally by other methods for consistency
+    /// @param _mainDApp Address of the target application for receiving instance outputs
     /// @param _templateHash Template hash for the instance's Cartesi Machine
     /// @param _id Instance identifier
     /// @return salt
     function calculateSalt(
+        address _mainDApp,
         bytes32 _templateHash,
         bytes32 _id
     )
         internal pure
         returns (bytes32)
     {
-        return keccak256(abi.encodePacked(_templateHash, _id));
+        return keccak256(abi.encodePacked(_mainDApp, _templateHash, _id));
     }
 
 
@@ -72,7 +74,7 @@ contract RollupsCompute {
             CartesiDApp(_mainDApp).getConsensus(),
             address(this),
             _templateHash,
-            this.calculateSalt(_templateHash, _id)
+            this.calculateSalt(_mainDApp, _templateHash, _id)
         );
     }
 
@@ -95,7 +97,7 @@ contract RollupsCompute {
             CartesiDApp(_mainDApp).getConsensus(),
             address(this),
             _templateHash,
-            this.calculateSalt(_templateHash, _id)
+            this.calculateSalt(_mainDApp, _templateHash, _id)
         );
 
         // ALTERNATIVE: add input to mainDApp with instance info (instance address + instantiator + templateHash + id)
