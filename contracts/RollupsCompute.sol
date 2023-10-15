@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-import {ICartesiDAppFactory} from "@cartesi/rollups/contracts/ICartesiDAppFactory.sol";
+import {ICartesiDAppFactory} from "@cartesi/rollups/contracts/dapp/ICartesiDAppFactory.sol";
+import {CartesiDApp} from "@cartesi/rollups/contracts/dapp/CartesiDApp.sol";
 import {IInputBox} from "@cartesi/rollups/contracts/inputs/IInputBox.sol";
 
 
@@ -13,16 +14,12 @@ contract RollupsCompute {
     IInputBox internal inputBox;
 
 
-    // mapping from instance address => instance info
-    mapping(address => InstanceInfo) internal instances;
-
-
     /// @notice Constructor
     /// @param _factory factory to create computation instances
     /// @param _inputBox input box to send inputs to Cartesi DApps
     constructor(ICartesiDAppFactory _factory, IInputBox _inputBox) {
-        this.factory = _factory;
-        this.inputBox = _inputBox;
+        factory = _factory;
+        inputBox = _inputBox;
     }
 
 
@@ -51,7 +48,7 @@ contract RollupsCompute {
     /// @param _id Instance identifier
     /// @return address
     function calculateInstanceAddress(
-        address _mainDApp,
+        address payable _mainDApp,
         bytes32 _templateHash,
         bytes32 _id
     )
@@ -62,7 +59,7 @@ contract RollupsCompute {
             CartesiDApp(_mainDApp).getConsensus(),
             address(this),
             _templateHash,
-            this.calculateSalt(_mainDApp, _templateHash, _id)
+            calculateSalt(_mainDApp, _templateHash, _id)
         );
     }
 
@@ -74,7 +71,7 @@ contract RollupsCompute {
     /// @param _id Instance identifier
     /// @return address
     function instantiate(
-        address _mainDApp,
+        address payable _mainDApp,
         bytes32 _templateHash,
         bytes32 _id
     )
@@ -85,11 +82,11 @@ contract RollupsCompute {
             CartesiDApp(_mainDApp).getConsensus(),
             address(this),
             _templateHash,
-            this.calculateSalt(_mainDApp, _templateHash, _id)
+            calculateSalt(_mainDApp, _templateHash, _id)
         );
 
         // inform mainDApp about instantiation
-        this.inputBox.addInput(
+        inputBox.addInput(
             _mainDApp,
             abi.encodePacked(
                 address(dapp),  // instance address
@@ -101,7 +98,7 @@ contract RollupsCompute {
 
         // inform instance about target mainDApp's address
         // - this way, the instance can emit vouchers directly to the mainDApp
-        this.inputBox.addInput(address(dapp), abi.encodePacked(_mainDApp));
+        inputBox.addInput(address(dapp), abi.encodePacked(_mainDApp));
 
         return dapp;
     }
