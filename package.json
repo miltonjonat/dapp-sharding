@@ -1,7 +1,7 @@
 {
-  "name": "rollups-compute",
+  "name": "dapp-sharding",
   "version": "0.1.0",
-  "repository": "https://github.com/miltonjonat/rollups-compute.git",
+  "repository": "https://github.com/miltonjonat/dapp-sharding.git",
   "author": "Milton Jonathan <milton.jonathan@cartesi.io>",
   "license": "Apache-2.0",
   "private": false,
