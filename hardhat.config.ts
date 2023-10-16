@@ -90,6 +90,10 @@ const config: HardhatUserConfig = {
       return undefined;
     }
   },
+
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY,
+  },
 };
 
 export default config;
