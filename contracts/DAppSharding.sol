@@ -30,14 +30,14 @@ contract DAppSharding {
     /// @param _id Shard identifier
     /// @return salt
     function calculateShardSalt(
-        address _mainDApp,
+        CartesiDApp _mainDApp,
         bytes32 _templateHash,
         bytes32 _id
     )
         internal pure
         returns (bytes32)
     {
-        return keccak256(abi.encodePacked(_mainDApp, _templateHash, _id));
+        return keccak256(abi.encodePacked(address(_mainDApp), _templateHash, _id));
     }
 
 
@@ -48,15 +48,15 @@ contract DAppSharding {
     /// @param _id Shard identifier
     /// @return address
     function calculateShardAddress(
-        address payable _mainDApp,
+        CartesiDApp _mainDApp,
         bytes32 _templateHash,
         bytes32 _id
     )
-        external view
+        public view
         returns (address)
     {
         return factory.calculateApplicationAddress(
-            CartesiDApp(_mainDApp).getConsensus(),
+            _mainDApp.getConsensus(),
             address(this),
             _templateHash,
             calculateShardSalt(_mainDApp, _templateHash, _id)
@@ -71,15 +71,15 @@ contract DAppSharding {
     /// @param _id Shard identifier
     /// @return address
     function createShard(
-        address payable _mainDApp,
+        CartesiDApp _mainDApp,
         bytes32 _templateHash,
         bytes32 _id
     )
-        external
+        public
         returns (CartesiDApp)
     {
         CartesiDApp shard = factory.newApplication(
-            CartesiDApp(_mainDApp).getConsensus(),
+            _mainDApp.getConsensus(),
             address(this),
             _templateHash,
             calculateShardSalt(_mainDApp, _templateHash, _id)
@@ -87,7 +87,7 @@ contract DAppSharding {
 
         // inform mainDApp about new shard
         inputBox.addInput(
-            _mainDApp,
+            address(_mainDApp),
             abi.encodePacked(
                 address(shard), // shard address
                 msg.sender,     // shard creator
@@ -98,7 +98,7 @@ contract DAppSharding {
 
         // inform shard about target mainDApp's address
         // - this way, the shard can emit vouchers directly to the mainDApp
-        inputBox.addInput(address(shard), abi.encodePacked(_mainDApp));
+        inputBox.addInput(address(shard), abi.encodePacked(address(_mainDApp)));
 
         return shard;
     }
