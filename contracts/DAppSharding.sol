@@ -34,7 +34,7 @@ contract DAppSharding {
         bytes32 _templateHash,
         bytes32 _id
     )
-        internal pure
+        public pure
         returns (bytes32)
     {
         return keccak256(abi.encodePacked(address(_mainDApp), _templateHash, _id));
@@ -69,11 +69,13 @@ contract DAppSharding {
     /// @param _mainDApp Address of the target application for receiving shard outputs
     /// @param _templateHash Template hash for the shard's Cartesi Machine
     /// @param _id Shard identifier
+    /// @param _config User-given shard-specific data
     /// @return address
     function createShard(
         CartesiDApp _mainDApp,
         bytes32 _templateHash,
-        bytes32 _id
+        bytes32 _id,
+        bytes calldata _config
     )
         public
         returns (CartesiDApp)
@@ -90,15 +92,21 @@ contract DAppSharding {
             address(_mainDApp),
             abi.encodePacked(
                 address(shard), // shard address
-                msg.sender,     // shard creator
-                _templateHash,  // templateHash used by the shard
+                msg.sender,     // shard creator address
+                _templateHash,  // shard machine templateHash
                 _id             // shard identifier
             )
         );
 
-        // inform shard about target mainDApp's address
-        // - this way, the shard can emit vouchers directly to the mainDApp
-        inputBox.addInput(address(shard), abi.encodePacked(address(_mainDApp)));
+        // inform shard about its general configuration
+        inputBox.addInput(
+            address(shard),
+            abi.encodePacked(
+                address(_mainDApp), // mainDApp address (used to emit vouchers directly to it)
+                _id,                // shard identifier
+                _config             // shard-specific data given by the creator
+            )
+        );
 
         return shard;
     }
