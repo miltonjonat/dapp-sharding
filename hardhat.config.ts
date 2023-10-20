@@ -2,6 +2,7 @@ import { HardhatUserConfig } from "hardhat/config";
 import { HttpNetworkUserConfig } from "hardhat/types";
 import { getSingletonFactoryInfo } from "@safe-global/safe-singleton-factory";
 import "@nomicfoundation/hardhat-toolbox";
+import "@typechain/hardhat";
 import "hardhat-deploy";
 import path from "path";
 import { Chain, sepolia } from "@wagmi/chains";
@@ -91,6 +92,10 @@ const config: HardhatUserConfig = {
     }
   },
 
+  typechain: {
+    outDir: "src/types",
+    target: "ethers-v5",
+  },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
   },

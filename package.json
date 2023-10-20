@@ -2,9 +2,25 @@
   "name": "dapp-sharding",
   "version": "0.1.0",
   "repository": "https://github.com/miltonjonat/dapp-sharding.git",
-  "author": "Milton Jonathan <milton.jonathan@cartesi.io>",
+  "author": "Milton Jonathan <mjonathan.cartesi@gmail.com>",
   "license": "Apache-2.0",
   "private": false,
+  "scripts": {
+    "build": "run-s compile export",
+    "clean:ignored": "rimraf artifacts cache deployments/localhost dist export src/types/*",
+    "clean:hardhat": "hardhat clean",
+    "clean": "run-s clean:hardhat clean:ignored",
+    "copy-dts": "copyfiles -u 1 \"src/**/*.d.ts\" dist/src",
+    "compile": "hardhat compile",
+    "deploy": "run-s deploy:sepolia",
+    "deploy:sepolia": "hardhat deploy --network sepolia --export export/abi/sepolia.json",
+    "export": "hardhat export-artifacts export/artifacts --hide-sources --including-empty-bytecode --including-no-public-functions",
+    "prepack": "run-s build tsc:prod copy-dts",
+    "start": "hardhat node",
+    "test": "hardhat test",
+    "tsc": "tsc",
+    "tsc:prod": "tsc -p tsconfig.prod.json"
+  },  
   "devDependencies": {
     "@ethersproject/abi": "^5.4.7",
     "@ethersproject/providers": "^5.4.7",
@@ -21,10 +37,12 @@
     "@types/node": ">=12.0.0",
     "@wagmi/chains": "^1.6",
     "chai": "^4.2.0",
+    "copyfiles": "^2",
     "ethers": "^5.4.7",
     "hardhat": "^2.14.0",
     "hardhat-deploy": "^0.11",
     "hardhat-gas-reporter": "^1.0.8",
+    "npm-run-all": "^4",
     "solidity-coverage": "^0.8.0",
     "ts-node": ">=8.0.0",
     "typechain": "^8.1.0",
@@ -32,5 +50,15 @@
   },
   "dependencies": {
     "@cartesi/rollups": "^1.1.0"
-  }
+  },
+  "files": [
+    "contracts",
+    "deployments/*/*.json",
+    "deployments/*/.chainid",
+    "dist/src",
+    "dist/deploy/*.js",
+    "export"
+  ],
+  "main": "./dist/src/types/index.js",
+  "types": "./dist/src/types/index.d.ts"
 }
